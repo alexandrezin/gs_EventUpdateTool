@@ -1,10 +1,22 @@
 //---------------------------------------------------------------------------------------------------//
 //                                    AVI-SPL Event Tracker Script                                   //
-//---------------------------------------------- v1.0 -----------------------------------------------//
-//                                       alexandrez@google.com                                       //
+//------------------------------------------- v1.0 - 2021 -------------------------------------------//
+//              Alexandre Zin.   Michael Nishimura.   Guang Lai.   Marcelo Aranovich.                //
 //---------------------------------------------------------------------------------------------------//
 
+//Install GutsApi and Forms Permissions
+function install() {
+  FormApp.getActiveForm();
+}
+
+//Install Spreadsheet Permission
+function installSpreadsheetPermissions() {
+  SpreadsheetApp.getActiveSpreadsheet();
+}
+
 //Global Constants
+const spreadsheetLink = "https://docs.google.com/spreadsheets/d/1ornnvbUnpBTXP8v0M9k9PIxMjOrF5Q5T-x4vVoKxZkk/edit";
+//
 const eventIdColumn = 1;
 const eventRequestDateColumn = 2;
 const eventRequesterColumn = 3;
@@ -23,14 +35,40 @@ const eventActualEndTimeColumn = 15;
 const eventIncidentsColumn = 16;
 const eventObservationsColumn = 17;
 
-//Global Functions
-function install() {
-  SpreadsheetApp.getActiveSpreadsheet();
-}
-
 function onOpen(){
   var ui = SpreadsheetApp.getUi();
   ui.createMenu("Event Menu")
     .addItem("Event Summary", "openEventSummary")
+    .addSeparator()
+    .addItem("Install Permissions", "installSpreadsheetPermissions")
+    .addItem("Report a Bug", "openReportBug")
     .addToUi();
+}
+
+function onFormSubmit(e){
+  Logger.log(e);
+
+  //Values will be an array with values in the same order as they appear in the spreadsheet.
+  var values = e.values;
+
+  //Create a instance of Event
+  var submittedEvent = new Event();
+
+  //Getting Values
+  submittedEvent.setRequestDate(Utilities.formatDate(new Date(values[0]), "-0800", "MM/dd/yyyy"));
+  submittedEvent.setRequester(values[1].split('@')[0]);
+  submittedEvent.setName(values[2]);
+  submittedEvent.setType(values[3]);
+  submittedEvent.setDate(values[4]);
+  submittedEvent.setSetupTime(values[5]);
+  submittedEvent.setStartTime(values[6]);
+  submittedEvent.setEndTime(values[7]);
+  submittedEvent.setTechNotes(values[8]);
+
+  var submittedEventSiteLocation = values[9];
+
+  //Create Guts Ticket
+  submittedEvent.setId(createGutsTicket(submittedEvent, submittedEventSiteLocation));
+  //Insert Event On Database
+  insertOnDatabase(submittedEvent, submittedEventSiteLocation);
 }

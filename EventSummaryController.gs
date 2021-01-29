@@ -11,7 +11,7 @@ function openEventSummary(){
 
   Logger.log("Selected Event: " + selectedEvent.getId());
 
-  showWebPage("EventSummary", "Event Summary");
+  showWebPage("EventSummaryPage", "Event Summary", "700", "800");
 
   Logger.log("Event Summary Successfully Opened");
 }
@@ -45,7 +45,7 @@ function processForm(formObject){
 
     selectedEvent = getEventInformation(sheet, eventRow);
 
-    showWebPage("EventSummary", "Event Updated");
+    showWebPage("EventSummaryPage", "Event Updated", "700", "800");
     
     Logger.log("Event Summary Successfully Refreshed");
   }
@@ -101,8 +101,8 @@ function getEventInformation(sheet, row){
 }
 
 //https://developers.google.com/apps-script/guides/html/templates#code.gs_1
-function showWebPage(file, title) {
-  var html = HtmlService.createTemplateFromFile(file).evaluate().setWidth("700").setHeight("800");
+function showWebPage(file, title, width, height) {
+  var html = HtmlService.createTemplateFromFile(file).evaluate().setWidth(width).setHeight(height);
   SpreadsheetApp.getUi().showModalDialog(html, title);
 }
 
