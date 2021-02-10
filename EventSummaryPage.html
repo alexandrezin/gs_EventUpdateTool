@@ -213,7 +213,7 @@
         </div>
         <div class="item readonly">
           <p>Request Date</p>
-          <input type="date" name="eventRequestDate" value="<?= formatSpreadsheetDate(selectedEvent.getRequestDate()); ?>" readonly/>
+          <input type="date" name="eventRequestDate" value="<?= selectedEvent.getRequestDate(); ?>" readonly/>
         </div>
         <div class="item">
           <p>Event Type</p>
@@ -236,34 +236,34 @@
         <hr/>
         <div class="item">
           <p>Event Date</p>
-          <input type="date" name="eventDate" value="<?= formatSpreadsheetDate(selectedEvent.getDate()); ?>"/>
+          <input type="date" name="eventDate" value="<?= selectedEvent.getDate(); ?>"/>
         </div>
         <div class="item">
           <p>Setup Time</p>
-          <input type="time" name="eventSetupTime" value="<?= formatSpreadsheetTime(selectedEvent.getSetupTime()); ?>"/>
+          <input type="time" name="eventSetupTime" value="<?= selectedEvent.getSetupTime(); ?>"/>
         </div>
         <div class="item">
           <p>Start Time</p>
-          <input type="time" name="eventStartTime" value="<?= formatSpreadsheetTime(selectedEvent.getStartTime()); ?>"/>
+          <input type="time" name="eventStartTime" value="<?= selectedEvent.getStartTime(); ?>"/>
         </div>
         <div class="item">
           <p>End Time</p>
-          <input type="time" name="eventEndTime" value="<?= formatSpreadsheetTime(selectedEvent.getEndTime()); ?>"/>
+          <input type="time" name="eventEndTime" value="<?= selectedEvent.getEndTime(); ?>"/>
         </div>
         <br/>
         <p> <strong>Post-Event Information</strong> </p>
         <hr/>
         <div class="item"> 
           <p>Actual Setup Time</p>
-          <input type="time" name="eventActualSetupTime" value="<?= formatSpreadsheetTime(selectedEvent.getActualSetupTime()); ?>"/>
+          <input type="time" name="eventActualSetupTime" value="<?= selectedEvent.getActualSetupTime(); ?>"/>
         </div>
         <div class="item"> 
           <p>Actual Start Time</p>
-          <input type="time" name="eventActualStartTime" value="<?= formatSpreadsheetTime(selectedEvent.getActualStartTime()); ?>"/>
+          <input type="time" name="eventActualStartTime" value="<?= selectedEvent.getActualStartTime(); ?>"/>
         </div>
         <div class="item"> 
           <p>Actual End Time</p>
-          <input type="time" name="eventActualEndTime" value="<?= formatSpreadsheetTime(selectedEvent.getActualEndTime()); ?>"/>
+          <input type="time" name="eventActualEndTime" value="<?= selectedEvent.getActualEndTime(); ?>"/>
         </div>
         <div class="item">
           <p>Event Type</p>

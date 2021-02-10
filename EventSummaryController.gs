@@ -19,14 +19,24 @@ function openEventSummary(){
 function processForm(formObject){
   Logger.log("Updating Event");
 
+  //Get old event information
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var selectedRow = sheet.getCurrentCell().getRow();
+
+  selectedEvent = getEventInformation(sheet, selectedRow);
+
+  //Get the updated event information
   var updatedEvent = new Event(formObject.eventId,formObject.eventRequestDate, formObject.eventRequester, formObject.eventType, formObject.eventName, formObject.eventDate, formObject.eventSetupTime, formObject.eventStartTime, formObject.eventEndTime, formObject.eventStatus, formObject.eventNotifiedInAdvance, formObject.eventTechNotes, formObject.eventActualSetupTime, formObject.eventActualStartTime, formObject.eventActualEndTime, formObject.eventIncidents, formObject.eventObservations);
 
-  Logger.log(updatedEvent.toString());
+  //Log information 
+  Logger.log("Selected Event:\n" + selectedEvent.toString());
+  Logger.log("Updated Event:\n" + updatedEvent.toString());
 
   try{
-    var sheet = SpreadsheetApp.getActiveSheet();
+    //Get the event row
     eventRow = getEventRow(sheet, updatedEvent.getId());
 
+    //Save the event data
     sheet.getRange(eventRow, eventTypeColumn).setValue(updatedEvent.getType());
     sheet.getRange(eventRow, eventNameColumn).setValue(updatedEvent.getName());
     sheet.getRange(eventRow, eventDateColumn).setValue(updatedEvent.getDate());
@@ -41,23 +51,49 @@ function processForm(formObject){
     sheet.getRange(eventRow, eventIncidentsColumn).setValue(updatedEvent.getIncidents());
     sheet.getRange(eventRow, eventObservationsColumn).setValue(updatedEvent.getObservations());
     
-    Logger.log("Event Successfully Updated");
+    Logger.log("Database Successfully Updated");
 
+    //Update the ticket
+    var summary = "" + updatedEvent.getDate() + " " + sheet.getName() + " - " + updatedEvent.getType() + " - " + updatedEvent.getName() + " ";
+    var status = "Pending";
+    if (updatedEvent.getStatus() == "Done") status = "Resolved";
+    else if (updatedEvent.getStatus() == "Cancelled") status = "Closed";
+    
+    var ticketJSON = {
+      "ticket":{
+        "core":{
+            "status":status,
+            "pendingWhat":"Pending Project",
+            "summary":summary,
+        },
+        "cecRequest":{
+            "eventDate": {"month":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","MM"),
+                          "year":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","yyyy"),
+                          "day":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","dd")
+                          },
+        }
+      }
+    };
+
+    Guts.Tickets.update(ticketJSON,updatedEvent.getId());
+
+    Logger.log("Guts Ticket Successfully Updated");
+
+    //Re-Open the Event Summary Page
     selectedEvent = getEventInformation(sheet, eventRow);
-
     showWebPage("EventSummaryPage", "Event Updated", "700", "800");
     
     Logger.log("Event Summary Successfully Refreshed");
   }
 
   catch(e){
+    //Show a Error Page
     errorMessage = e;
-    showWebPage("ErrorPage", "Failed to Update the Event!");
+    showWebPage("ErrorPage", "Failed to Update the Event!", "700", "800");
   }
 }
 
 function getEventRow(sheet, eventId){
-
   var lastSpreadsheetRow = sheet.getRange("A:A").getLastRow();
   var row = null;
 
@@ -74,26 +110,29 @@ function getEventRow(sheet, eventId){
 
 function getEventInformation(sheet, row){
   var event = new Event();
-
+  
   Logger.log("Getting event information");
 
   var values = sheet.getRange("A" + row + ":Q" + row).getValues();
 
   event.setId(values[0][eventIdColumn - 1]);
-  event.setRequestDate(values[0][eventRequestDateColumn - 1]);
+  //Ignore empty cells
+  if (values[0][eventRequestDateColumn - 1] != "") event.setRequestDate(values[0][eventRequestDateColumn - 1]);
   event.setRequester(values[0][eventRequesterColumn - 1]);
   event.setType(values[0][eventTypeColumn - 1]);
   event.setName(values[0][eventNameColumn - 1]);
-  event.setDate(values[0][eventDateColumn - 1]);
-  event.setSetupTime(values[0][eventSetupTimeColumn - 1]);
-  event.setStartTime(values[0][eventStartTimeColumn - 1]);
-  event.setEndTime(values[0][eventEndTimeColumn - 1]);
+  //Ignore empty cells
+  if (values[0][eventDateColumn - 1] != "") event.setDate(values[0][eventDateColumn - 1]);
+  if (values[0][eventSetupTimeColumn - 1] != "") event.setSetupTime(values[0][eventSetupTimeColumn - 1]);
+  if (values[0][eventStartTimeColumn - 1] != "") event.setStartTime(values[0][eventStartTimeColumn - 1]);
+  if (values[0][eventEndTimeColumn - 1] != "") event.setEndTime(values[0][eventEndTimeColumn - 1]);
   event.setStatus(values[0][eventStatusColumn - 1]);
   event.setNotifiedInAdvance(values[0][eventNotifiedInAdvanceColumn - 1]);
   event.setTechNotes(values[0][eventTechNotesColumn - 1]);
-  event.setActualSetupTime(values[0][eventActualSetupTimeColumn - 1]);
-  event.setActualStartTime(values[0][eventActualStartTimeColumn - 1]);
-  event.setActualEndTime(values[0][eventActualEndTimeColumn - 1]);
+  //Ignore empty cells
+  if (values[0][eventActualSetupTimeColumn - 1] != "") event.setActualSetupTime(values[0][eventActualSetupTimeColumn - 1]);
+  if (values[0][eventActualStartTimeColumn - 1] != "") event.setActualStartTime(values[0][eventActualStartTimeColumn - 1]);
+  if (values[0][eventActualEndTimeColumn - 1] != "") event.setActualEndTime(values[0][eventActualEndTimeColumn - 1]);
   event.setIncidents(values[0][eventIncidentsColumn - 1]);
   event.setObservations(values[0][eventObservationsColumn - 1]);
 
@@ -104,18 +143,4 @@ function getEventInformation(sheet, row){
 function showWebPage(file, title, width, height) {
   var html = HtmlService.createTemplateFromFile(file).evaluate().setWidth(width).setHeight(height);
   SpreadsheetApp.getUi().showModalDialog(html, title);
-}
-
-function formatSpreadsheetTime(time){
-  if (time != ""){
-    return Utilities.formatDate(new Date(time),"GMT-0800", "HH:mm");
-  }
-  else return "";
-}
-
-function formatSpreadsheetDate(date){
-  if (date != ""){
-    return Utilities.formatDate(new Date(date),"GMT-0800", "yyyy-MM-dd");
-  }
-  else return "";
 }

@@ -23,23 +23,23 @@ class Event {
 
     //Methods
     this.toString=function(){
-      return "ID: "               + this.id
-        + "\nRequestDate: "       + this.requestDate
-        + "\nRequester: "         + this.requester
-        + "\nType: "              + this.type
-        + "\nName: "              + this.name
-        + "\nDate: "              + this.date
-        + "\nSetupTime: "         + this.setupTime
-        + "\nStartTime: "         + this.startTime
-        + "\nEndTime: "           + this.endTime
-        + "\nStatus: "            + this.status
-        + "\nNotifiedInAdvance: " + this.notifiedInAdvance
-        + "\nTechNotes: "         + this.techNotes
-        + "\nActualSetupTime: "   + this.actualSetupTime
-        + "\nActualStartTime: "   + this.actualStartTime
-        + "\nActualEndTime: "     + this.actualEndTime
-        + "\nIncidents: "         + this.incidents
-        + "\nObservations: "      + this.observations;
+      return "ID: "               + this.getId()
+        + "\nRequestDate: "       + this.getRequestDate()
+        + "\nRequester: "         + this.getRequester()
+        + "\nType: "              + this.getType()
+        + "\nName: "              + this.getName()
+        + "\nDate: "              + this.getDate()
+        + "\nSetupTime: "         + this.getSetupTime()
+        + "\nStartTime: "         + this.getStartTime()
+        + "\nEndTime: "           + this.getEndTime()
+        + "\nStatus: "            + this.getStatus()
+        + "\nNotifiedInAdvance: " + this.getNotifiedInAdvance()
+        + "\nTechNotes: "         + this.getTechNotes()
+        + "\nActualSetupTime: "   + this.getActualSetupTime()
+        + "\nActualStartTime: "   + this.getActualStartTime()
+        + "\nActualEndTime: "     + this.getActualEndTime()
+        + "\nIncidents: "         + this.getIncidents()
+        + "\nObservations: "      + this.getObservations();
     }
 
     this.getEventStatusDefaultSelected=function(option){
@@ -101,7 +101,7 @@ class Event {
 
     //GET-SET requestDate
     this.setRequestDate=function(requestDate){
-      this.requestDate = requestDate;
+      this.requestDate = Utilities.formatDate(new Date(requestDate),"GMT-0800", "yyyy-MM-dd");
     };
     this.getRequestDate=function(){
       return this.requestDate;
@@ -133,7 +133,7 @@ class Event {
 
     //GET-SET date
     this.setDate=function(date){
-      this.date = date;
+      this.date = Utilities.formatDate(new Date(date),"GMT-0800", "yyyy-MM-dd");
     };
     this.getDate=function(){
       return this.date;
@@ -141,7 +141,7 @@ class Event {
 
     //GET-SET setupTime
     this.setSetupTime=function(setupTime){
-      this.setupTime = setupTime;
+      this.setupTime = Utilities.formatDate(new Date(setupTime),"GMT-0800", "HH:mm");
     };
     this.getSetupTime=function(){
       return this.setupTime;
@@ -149,7 +149,7 @@ class Event {
 
     //GET-SET startTime
     this.setStartTime=function(startTime){
-      this.startTime = startTime;
+      this.startTime = Utilities.formatDate(new Date(startTime),"GMT-0800", "HH:mm");
     };
     this.getStartTime=function(){
       return this.startTime;
@@ -157,7 +157,7 @@ class Event {
 
     //GET-SET endTime
     this.setEndTime=function(endTime){
-      this.endTime = endTime;
+      this.endTime = Utilities.formatDate(new Date(endTime),"GMT-0800", "HH:mm");
     };
     this.getEndTime=function(){
       return this.endTime;
@@ -189,7 +189,7 @@ class Event {
 
     //GET-SET actualSetupTime
     this.setActualSetupTime=function(actualSetupTime){
-      this.actualSetupTime = actualSetupTime;
+      this.actualSetupTime = Utilities.formatDate(new Date(actualSetupTime),"GMT-0800", "HH:mm");
     };
     this.getActualSetupTime=function(){
       return this.actualSetupTime;
@@ -197,7 +197,7 @@ class Event {
 
     //GET-SET actualStartTime
     this.setActualStartTime=function(actualStartTime){
-      this.actualStartTime = actualStartTime;
+      this.actualStartTime = Utilities.formatDate(new Date(actualStartTime),"GMT-0800", "HH:mm");
     };
     this.getActualStartTime=function(){
       return this.actualStartTime;
@@ -205,7 +205,7 @@ class Event {
 
     //GET-SET actualEndTime
     this.setActualEndTime=function(actualEndTime){
-      this.actualEndTime = actualEndTime;
+      this.actualEndTime = Utilities.formatDate(new Date(actualEndTime),"GMT-0800", "HH:mm");
     };
     this.getActualEndTime=function(){
       return this.actualEndTime;

@@ -38,7 +38,8 @@ const eventObservationsColumn = 17;
 function onOpen(){
   var ui = SpreadsheetApp.getUi();
   ui.createMenu("Event Menu")
-    .addItem("Event Summary", "openEventSummary")
+    .addItem("Create Event", "openGoogleForms")
+    .addItem("Update Event", "openEventSummary")
     .addSeparator()
     .addItem("Install Permissions", "installSpreadsheetPermissions")
     .addItem("Report a Bug", "openReportBug")
@@ -55,14 +56,14 @@ function onFormSubmit(e){
   var submittedEvent = new Event();
 
   //Getting Values
-  submittedEvent.setRequestDate(Utilities.formatDate(new Date(values[0]), "-0800", "MM/dd/yyyy"));
+  submittedEvent.setRequestDate(values[0]);
   submittedEvent.setRequester(values[1].split('@')[0]);
   submittedEvent.setName(values[2]);
   submittedEvent.setType(values[3]);
   submittedEvent.setDate(values[4]);
-  submittedEvent.setSetupTime(values[5]);
-  submittedEvent.setStartTime(values[6]);
-  submittedEvent.setEndTime(values[7]);
+  if (values[5] != "") submittedEvent.setSetupTime("Sat Dec 30 1899 GMT-0800 " + values[5]);
+  if (values[6] != "") submittedEvent.setStartTime("Sat Dec 30 1899 GMT-0800 " + values[6]);
+  if (values[7] != "") submittedEvent.setEndTime("Sat Dec 30 1899 GMT-0800 " + values[7]);
   submittedEvent.setTechNotes(values[8]);
 
   var submittedEventSiteLocation = values[9];

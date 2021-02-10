@@ -64,7 +64,7 @@ function createGutsTicket(submittedEvent, siteLocation) {
   }
 
   //Guts Summary and Description This needs QA
-  var summary = "" + submittedEvent.getDate() + " " + siteLocation + " " + submittedEvent.getType() + " " + submittedEvent.getName() + " ";
+  var summary = "" + submittedEvent.getDate() + " " + siteLocation + " - " + submittedEvent.getType() + " - " + submittedEvent.getName() + " ";
   var description = "" + siteLocation + " " + submittedEvent.getType() + "\n \n" + "Event Name: " + submittedEvent.getName() +"\n Event Setup Time: " + submittedEvent.getSetupTime() + "\n Event Start Time: " + submittedEvent.getStartTime() + "\n Event End Time: " + submittedEvent.getEndTime() + "\n Tech Notes:" + submittedEvent.getTechNotes();
 
   // The category, type, and item have to exist in GUTS to be used. They are also case-sensitive.
@@ -103,9 +103,9 @@ function createGutsTicket(submittedEvent, siteLocation) {
                       },
         "attendingTech":attendingTech,
         "rcaRequired": "false"
+      }
     }
-  }
-};
+  };
 
   Logger.log(ticketJSON);
 
