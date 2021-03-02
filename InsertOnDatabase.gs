@@ -2,7 +2,7 @@ function insertOnDatabase(submittedEvent, siteLocation){
  
  //Lock the function to avoid problems with multiple submissions at the same time
  var lock = LockService.getScriptLock(); //Lock
- lock.waitLock(20000);                   //For 20 sec.
+ lock.waitLock(50000);                   //For 50 sec.
  
  //Open the center spreadsheet
  var spreadsheet = SpreadsheetApp.openByUrl(spreadsheetLink);

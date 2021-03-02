@@ -8,6 +8,10 @@ function openGoogleForms(){
   redirectTo("https://docs.google.com/forms/d/e/1FAIpQLSeehRftc3aUwGLxPcV0J1yNmAuBXO4MAwXMHDPDQI5jGGzSRQ/viewform?usp=sf_link");
 }
 
+function openHelpSite(){
+  redirectTo("https://sites.google.com/corp/google.com/event-tracker-help/home");
+}
+
 //-----------------------------------------
 
 function redirectTo(link){

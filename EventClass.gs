@@ -101,7 +101,8 @@ class Event {
 
     //GET-SET requestDate
     this.setRequestDate=function(requestDate){
-      this.requestDate = Utilities.formatDate(new Date(requestDate),"GMT-0800", "yyyy-MM-dd");
+      if(requestDate != "") this.requestDate = Utilities.formatDate(new Date(requestDate),"GMT-0800", "yyyy-MM-dd");
+      else this.requestDate = "";
     };
     this.getRequestDate=function(){
       return this.requestDate;
@@ -133,7 +134,8 @@ class Event {
 
     //GET-SET date
     this.setDate=function(date){
-      this.date = Utilities.formatDate(new Date(date),"GMT-0800", "yyyy-MM-dd");
+      if(date != "") this.date = Utilities.formatDate(new Date(date),"GMT-0800", "yyyy-MM-dd");
+      else this.date = "";
     };
     this.getDate=function(){
       return this.date;
@@ -141,7 +143,8 @@ class Event {
 
     //GET-SET setupTime
     this.setSetupTime=function(setupTime){
-      this.setupTime = Utilities.formatDate(new Date(setupTime),"GMT-0800", "HH:mm");
+      if(setupTime != "") this.setupTime = Utilities.formatDate(new Date(setupTime),"GMT-0800", "HH:mm");
+      else this.setupTime = "";
     };
     this.getSetupTime=function(){
       return this.setupTime;
@@ -149,7 +152,8 @@ class Event {
 
     //GET-SET startTime
     this.setStartTime=function(startTime){
-      this.startTime = Utilities.formatDate(new Date(startTime),"GMT-0800", "HH:mm");
+      if(startTime != "") this.startTime = Utilities.formatDate(new Date(startTime),"GMT-0800", "HH:mm");
+      else this.startTime = "";
     };
     this.getStartTime=function(){
       return this.startTime;
@@ -157,7 +161,8 @@ class Event {
 
     //GET-SET endTime
     this.setEndTime=function(endTime){
-      this.endTime = Utilities.formatDate(new Date(endTime),"GMT-0800", "HH:mm");
+      if(endTime != "") this.endTime = Utilities.formatDate(new Date(endTime),"GMT-0800", "HH:mm");
+      else this.endTime = "";
     };
     this.getEndTime=function(){
       return this.endTime;
@@ -189,7 +194,8 @@ class Event {
 
     //GET-SET actualSetupTime
     this.setActualSetupTime=function(actualSetupTime){
-      this.actualSetupTime = Utilities.formatDate(new Date(actualSetupTime),"GMT-0800", "HH:mm");
+      if(actualSetupTime != "") this.actualSetupTime = Utilities.formatDate(new Date(actualSetupTime),"GMT-0800", "HH:mm");
+      else this.actualSetupTime = "";
     };
     this.getActualSetupTime=function(){
       return this.actualSetupTime;
@@ -197,7 +203,8 @@ class Event {
 
     //GET-SET actualStartTime
     this.setActualStartTime=function(actualStartTime){
-      this.actualStartTime = Utilities.formatDate(new Date(actualStartTime),"GMT-0800", "HH:mm");
+      if(actualStartTime != "") this.actualStartTime = Utilities.formatDate(new Date(actualStartTime),"GMT-0800", "HH:mm");
+      else this.actualStartTime = "";
     };
     this.getActualStartTime=function(){
       return this.actualStartTime;
@@ -205,7 +212,8 @@ class Event {
 
     //GET-SET actualEndTime
     this.setActualEndTime=function(actualEndTime){
-      this.actualEndTime = Utilities.formatDate(new Date(actualEndTime),"GMT-0800", "HH:mm");
+      if(actualEndTime != "") this.actualEndTime = Utilities.formatDate(new Date(actualEndTime),"GMT-0800", "HH:mm");
+      else this.actualEndTime = "";
     };
     this.getActualEndTime=function(){
       return this.actualEndTime;

@@ -9,7 +9,7 @@ function install() {
   FormApp.getActiveForm();
 }
 
-//Install Spreadsheet Permission
+//Install Spreadsheet Permissions
 function installSpreadsheetPermissions() {
   SpreadsheetApp.getActiveSpreadsheet();
 }
@@ -43,6 +43,8 @@ function onOpen(){
     .addSeparator()
     .addItem("Install Permissions", "installSpreadsheetPermissions")
     .addItem("Report a Bug", "openReportBug")
+    .addSeparator()
+    .addItem("Help", "openHelpSite")
     .addToUi();
 }
 
@@ -68,8 +70,12 @@ function onFormSubmit(e){
 
   var submittedEventSiteLocation = values[9];
 
-  //Create Guts Ticket
-  submittedEvent.setId(createGutsTicket(submittedEvent, submittedEventSiteLocation));
+  for (var tries = 0; tries < 3; tries++){
+    //Create Guts Ticket
+    submittedEvent.setId(createGutsTicket(submittedEvent, submittedEventSiteLocation));
+    if (submittedEvent.getId() != 0) tries = 3;
+  }
+
   //Insert Event On Database
   insertOnDatabase(submittedEvent, submittedEventSiteLocation);
 }

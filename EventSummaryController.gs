@@ -6,7 +6,6 @@ function openEventSummary(){
 
   var sheet = SpreadsheetApp.getActiveSheet();
   var selectedRow = sheet.getCurrentCell().getRow();
-
   selectedEvent = getEventInformation(sheet, selectedRow);
 
   Logger.log("Selected Event: " + selectedEvent.getId());
@@ -22,7 +21,6 @@ function processForm(formObject){
   //Get old event information
   var sheet = SpreadsheetApp.getActiveSheet();
   var selectedRow = sheet.getCurrentCell().getRow();
-
   selectedEvent = getEventInformation(sheet, selectedRow);
 
   //Get the updated event information
@@ -33,25 +31,8 @@ function processForm(formObject){
   Logger.log("Updated Event:\n" + updatedEvent.toString());
 
   try{
-    //Get the event row
-    eventRow = getEventRow(sheet, updatedEvent.getId());
-
-    //Save the event data
-    sheet.getRange(eventRow, eventTypeColumn).setValue(updatedEvent.getType());
-    sheet.getRange(eventRow, eventNameColumn).setValue(updatedEvent.getName());
-    sheet.getRange(eventRow, eventDateColumn).setValue(updatedEvent.getDate());
-    sheet.getRange(eventRow, eventSetupTimeColumn).setValue(updatedEvent.getSetupTime());
-    sheet.getRange(eventRow, eventStartTimeColumn).setValue(updatedEvent.getStartTime());
-    sheet.getRange(eventRow, eventEndTimeColumn).setValue(updatedEvent.getEndTime());
-    sheet.getRange(eventRow, eventStatusColumn).setValue(updatedEvent.getStatus());
-    sheet.getRange(eventRow, eventTechNotesColumn).setValue(updatedEvent.getTechNotes()).setBorder(false,false,false,true,false,false,"Black",SpreadsheetApp.BorderStyle.SOLID);
-    sheet.getRange(eventRow, eventActualSetupTimeColumn).setValue(updatedEvent.getActualSetupTime());
-    sheet.getRange(eventRow, eventActualStartTimeColumn).setValue(updatedEvent.getActualStartTime());
-    sheet.getRange(eventRow, eventActualEndTimeColumn).setValue(updatedEvent.getActualEndTime());
-    sheet.getRange(eventRow, eventIncidentsColumn).setValue(updatedEvent.getIncidents());
-    sheet.getRange(eventRow, eventObservationsColumn).setValue(updatedEvent.getObservations());
-    
-    Logger.log("Database Successfully Updated");
+    //If the event has not been updated throw an exception
+    if (selectedEvent.toString() == updatedEvent.toString()) throw new Error("No information to update");
 
     //Update the ticket
     var summary = "" + updatedEvent.getDate() + " " + sheet.getName() + " - " + updatedEvent.getType() + " - " + updatedEvent.getName() + " ";
@@ -79,6 +60,26 @@ function processForm(formObject){
 
     Logger.log("Guts Ticket Successfully Updated");
 
+    //Get the event row
+    eventRow = getEventRow(sheet, updatedEvent.getId());
+
+    //Save the event data
+    sheet.getRange(eventRow, eventTypeColumn).setValue(updatedEvent.getType());
+    sheet.getRange(eventRow, eventNameColumn).setValue(updatedEvent.getName());
+    sheet.getRange(eventRow, eventDateColumn).setValue(updatedEvent.getDate());
+    sheet.getRange(eventRow, eventSetupTimeColumn).setValue(updatedEvent.getSetupTime());
+    sheet.getRange(eventRow, eventStartTimeColumn).setValue(updatedEvent.getStartTime());
+    sheet.getRange(eventRow, eventEndTimeColumn).setValue(updatedEvent.getEndTime());
+    sheet.getRange(eventRow, eventStatusColumn).setValue(updatedEvent.getStatus());
+    sheet.getRange(eventRow, eventTechNotesColumn).setValue(updatedEvent.getTechNotes()).setBorder(false,false,false,true,false,false,"Black",SpreadsheetApp.BorderStyle.SOLID);
+    sheet.getRange(eventRow, eventActualSetupTimeColumn).setValue(updatedEvent.getActualSetupTime());
+    sheet.getRange(eventRow, eventActualStartTimeColumn).setValue(updatedEvent.getActualStartTime());
+    sheet.getRange(eventRow, eventActualEndTimeColumn).setValue(updatedEvent.getActualEndTime());
+    sheet.getRange(eventRow, eventIncidentsColumn).setValue(updatedEvent.getIncidents());
+    sheet.getRange(eventRow, eventObservationsColumn).setValue(updatedEvent.getObservations());
+    
+    Logger.log("Database Successfully Updated");
+    
     //Re-Open the Event Summary Page
     selectedEvent = getEventInformation(sheet, eventRow);
     showWebPage("EventSummaryPage", "Event Updated", "700", "800");
@@ -90,6 +91,7 @@ function processForm(formObject){
     //Show a Error Page
     errorMessage = e;
     showWebPage("ErrorPage", "Failed to Update the Event!", "700", "800");
+    Logger.log("Event Update Failed: " + e);
   }
 }
 
@@ -116,23 +118,20 @@ function getEventInformation(sheet, row){
   var values = sheet.getRange("A" + row + ":Q" + row).getValues();
 
   event.setId(values[0][eventIdColumn - 1]);
-  //Ignore empty cells
-  if (values[0][eventRequestDateColumn - 1] != "") event.setRequestDate(values[0][eventRequestDateColumn - 1]);
+  event.setRequestDate(values[0][eventRequestDateColumn - 1]);
   event.setRequester(values[0][eventRequesterColumn - 1]);
   event.setType(values[0][eventTypeColumn - 1]);
   event.setName(values[0][eventNameColumn - 1]);
-  //Ignore empty cells
-  if (values[0][eventDateColumn - 1] != "") event.setDate(values[0][eventDateColumn - 1]);
-  if (values[0][eventSetupTimeColumn - 1] != "") event.setSetupTime(values[0][eventSetupTimeColumn - 1]);
-  if (values[0][eventStartTimeColumn - 1] != "") event.setStartTime(values[0][eventStartTimeColumn - 1]);
-  if (values[0][eventEndTimeColumn - 1] != "") event.setEndTime(values[0][eventEndTimeColumn - 1]);
+  event.setDate(values[0][eventDateColumn - 1]);
+  event.setSetupTime(values[0][eventSetupTimeColumn - 1]);
+  event.setStartTime(values[0][eventStartTimeColumn - 1]);
+  event.setEndTime(values[0][eventEndTimeColumn - 1]);
   event.setStatus(values[0][eventStatusColumn - 1]);
   event.setNotifiedInAdvance(values[0][eventNotifiedInAdvanceColumn - 1]);
   event.setTechNotes(values[0][eventTechNotesColumn - 1]);
-  //Ignore empty cells
-  if (values[0][eventActualSetupTimeColumn - 1] != "") event.setActualSetupTime(values[0][eventActualSetupTimeColumn - 1]);
-  if (values[0][eventActualStartTimeColumn - 1] != "") event.setActualStartTime(values[0][eventActualStartTimeColumn - 1]);
-  if (values[0][eventActualEndTimeColumn - 1] != "") event.setActualEndTime(values[0][eventActualEndTimeColumn - 1]);
+  event.setActualSetupTime(values[0][eventActualSetupTimeColumn - 1]);
+  event.setActualStartTime(values[0][eventActualStartTimeColumn - 1]);
+  event.setActualEndTime(values[0][eventActualEndTimeColumn - 1]);
   event.setIncidents(values[0][eventIncidentsColumn - 1]);
   event.setObservations(values[0][eventObservationsColumn - 1]);
 

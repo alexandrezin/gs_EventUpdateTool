@@ -1,5 +1,9 @@
 function createGutsTicket(submittedEvent, siteLocation) {
 
+ //Lock the function to avoid problems with multiple submissions at the same time
+ var lock = LockService.getScriptLock(); //Lock
+ lock.waitLock(30000);                   //For 30 sec.
+
   //Check for MTV
   if(siteLocation == "Google Partner Plex, Mountain View"){
     var assignee = "cameronle";
@@ -47,7 +51,7 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for SIN
   else if(siteLocation == "RoundHouse, Singapore"){
-    var assignee = "cameronle";
+    var assignee = "stanleytan";
     var ccList = "stanleytan, nheng, arca";
     var region = "APAC";
     var site = "RDH-SIN";
@@ -65,7 +69,7 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Guts Summary and Description This needs QA
   var summary = "" + submittedEvent.getDate() + " " + siteLocation + " - " + submittedEvent.getType() + " - " + submittedEvent.getName() + " ";
-  var description = "" + siteLocation + " " + submittedEvent.getType() + "\n \n" + "Event Name: " + submittedEvent.getName() +"\n Event Setup Time: " + submittedEvent.getSetupTime() + "\n Event Start Time: " + submittedEvent.getStartTime() + "\n Event End Time: " + submittedEvent.getEndTime() + "\n Tech Notes:" + submittedEvent.getTechNotes();
+  var description = "" + siteLocation + " " + submittedEvent.getType() + "\n \n" + "Event Name: " + submittedEvent.getName() + "\n Event Date: " + submittedEvent.getDate() + "\n Event Setup Time: " + submittedEvent.getSetupTime() + "\n Event Start Time: " + submittedEvent.getStartTime() + "\n Event End Time: " + submittedEvent.getEndTime() + "\n Tech Notes:" + submittedEvent.getTechNotes();
 
   // The category, type, and item have to exist in GUTS to be used. They are also case-sensitive.
   var priority = "low";
@@ -117,12 +121,18 @@ function createGutsTicket(submittedEvent, siteLocation) {
     lastCell.setValue('=HYPERLINK("https://gutsv3.corp.google.com/#ticket/' + ticketId + "\"," + ticketId + ")");
     regionCell.setValue(region);
 
+    //Release the function lock
+    lock.releaseLock();
+
     return ticketId;
   }
 
   catch(err) {  
     Logger.log(err);
     Logger.log(response);
+
+    //Release the function lock
+    lock.releaseLock(); 
 
     return 0;
   }
