@@ -4,12 +4,15 @@ var errorMessage;
 function openEventSummary(){
   Logger.log("Opening Event Sumary");
 
+  //Open the spreadsheet and get the selected row
   var sheet = SpreadsheetApp.getActiveSheet();
   var selectedRow = sheet.getCurrentCell().getRow();
+  //Get the event information of that row
   selectedEvent = getEventInformation(sheet, selectedRow);
 
   Logger.log("Selected Event: " + selectedEvent.getId());
 
+  //Call the function to show the web page
   showWebPage("EventSummaryPage", "Event Summary", "700", "800");
 
   Logger.log("Event Summary Successfully Opened");
@@ -18,15 +21,16 @@ function openEventSummary(){
 function processForm(formObject){
   Logger.log("Updating Event");
 
-  //Get old event information
+  //Open the spreadsheet and get the selected row
   var sheet = SpreadsheetApp.getActiveSheet();
   var selectedRow = sheet.getCurrentCell().getRow();
+  //Get the event information of that row
   selectedEvent = getEventInformation(sheet, selectedRow);
 
-  //Get the updated event information
-  var updatedEvent = new Event(formObject.eventId,formObject.eventRequestDate, formObject.eventRequester, formObject.eventType, formObject.eventName, formObject.eventDate, formObject.eventSetupTime, formObject.eventStartTime, formObject.eventEndTime, formObject.eventStatus, formObject.eventNotifiedInAdvance, formObject.eventTechNotes, formObject.eventActualSetupTime, formObject.eventActualStartTime, formObject.eventActualEndTime, formObject.eventIncidents, formObject.eventObservations);
+  //Get the updated event information from the HTML form object received
+  var updatedEvent = new Event(formObject.eventId,formObject.eventRequestDate, formObject.eventRequester, formObject.eventType, formObject.eventName, formObject.eventDate, formObject.eventSetupTime, formObject.eventStartTime, formObject.eventEndTime, formObject.eventStatus, formObject.eventNotifiedInAdvance, formObject.eventTechNotes, formObject.eventActualSetupTime, formObject.eventActualStartTime, formObject.eventActualEndTime, formObject.eventIncidents, formObject.eventObservations, formObject.eventAssignee);
 
-  //Log information 
+  //Log both events
   Logger.log("Selected Event:\n" + selectedEvent.toString());
   Logger.log("Updated Event:\n" + updatedEvent.toString());
 
@@ -36,25 +40,54 @@ function processForm(formObject){
 
     //Update the ticket
     var summary = "" + updatedEvent.getDate() + " " + sheet.getName() + " - " + updatedEvent.getType() + " - " + updatedEvent.getName() + " ";
+
     var status = "Pending";
     if (updatedEvent.getStatus() == "Done") status = "Resolved";
     else if (updatedEvent.getStatus() == "Cancelled") status = "Closed";
+    else if (updatedEvent.getStatus() == "Pending Assignment") status = "Assigned";
     
-    var ticketJSON = {
-      "ticket":{
-        "core":{
-            "status":status,
-            "pendingWhat":"Pending Project",
-            "summary":summary,
-        },
-        "cecRequest":{
-            "eventDate": {"month":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","MM"),
-                          "year":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","yyyy"),
-                          "day":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","dd")
-                          },
+    //Update the priority just if the event date has been changed  
+    if (updatedEvent.getDate() != selectedEvent.getDate()){      
+      
+      var priority = getEventPriority(updatedEvent);
+      
+      var ticketJSON = {
+        "ticket":{
+          "core":{
+              "assignee": updatedEvent.getAssignee(),
+              "status":status,
+              "priority":priority,
+              "pendingWhat":"Pending Project",
+              "summary":summary,
+          },
+          "cecRequest":{
+              "eventDate": {"month":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","MM"),
+                            "year":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","yyyy"),
+                            "day":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","dd")
+                            },
+          }
         }
-      }
-    };
+      };
+    }
+
+    else{
+      var ticketJSON = {
+        "ticket":{
+          "core":{
+              "assignee": updatedEvent.getAssignee(),
+              "status":status,
+              "pendingWhat":"Pending Project",
+              "summary":summary,
+          },
+          "cecRequest":{
+              "eventDate": {"month":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","MM"),
+                            "year":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","yyyy"),
+                            "day":Utilities.formatDate(new Date(updatedEvent.getDate()),"-0800","dd")
+                            },
+          }
+        }
+      };
+    }
 
     Guts.Tickets.update(ticketJSON,updatedEvent.getId());
 
@@ -71,6 +104,7 @@ function processForm(formObject){
     sheet.getRange(eventRow, eventStartTimeColumn).setValue(updatedEvent.getStartTime());
     sheet.getRange(eventRow, eventEndTimeColumn).setValue(updatedEvent.getEndTime());
     sheet.getRange(eventRow, eventStatusColumn).setValue(updatedEvent.getStatus());
+    sheet.getRange(eventRow, eventAssigneeColumn).setValue(updatedEvent.getAssignee());
     sheet.getRange(eventRow, eventTechNotesColumn).setValue(updatedEvent.getTechNotes()).setBorder(false,false,false,true,false,false,"Black",SpreadsheetApp.BorderStyle.SOLID);
     sheet.getRange(eventRow, eventActualSetupTimeColumn).setValue(updatedEvent.getActualSetupTime());
     sheet.getRange(eventRow, eventActualStartTimeColumn).setValue(updatedEvent.getActualStartTime());
@@ -118,15 +152,16 @@ function getEventInformation(sheet, row){
   var values = sheet.getRange("A" + row + ":Q" + row).getValues();
 
   event.setId(values[0][eventIdColumn - 1]);
-  event.setRequestDate(values[0][eventRequestDateColumn - 1]);
+  event.setRequestDate("" + values[0][eventRequestDateColumn - 1].toString().split(" ")[1] + " " + values[0][eventRequestDateColumn - 1].toString().split(" ")[2] + " " + values[0][eventRequestDateColumn - 1].toString().split(" ")[3] + " 00:00:00 GMT-0800");
   event.setRequester(values[0][eventRequesterColumn - 1]);
   event.setType(values[0][eventTypeColumn - 1]);
   event.setName(values[0][eventNameColumn - 1]);
-  event.setDate(values[0][eventDateColumn - 1]);
+  event.setDate("" + values[0][eventDateColumn - 1].toString().split(" ")[1] + " " + values[0][eventDateColumn - 1].toString().split(" ")[2] + " " + values[0][eventDateColumn - 1].toString().split(" ")[3] + " 00:00:00 GMT-0800");
   event.setSetupTime(values[0][eventSetupTimeColumn - 1]);
   event.setStartTime(values[0][eventStartTimeColumn - 1]);
   event.setEndTime(values[0][eventEndTimeColumn - 1]);
   event.setStatus(values[0][eventStatusColumn - 1]);
+  event.setAssignee(values[0][eventAssigneeColumn - 1]);
   event.setNotifiedInAdvance(values[0][eventNotifiedInAdvanceColumn - 1]);
   event.setTechNotes(values[0][eventTechNotesColumn - 1]);
   event.setActualSetupTime(values[0][eventActualSetupTimeColumn - 1]);
@@ -137,6 +172,28 @@ function getEventInformation(sheet, row){
 
   return event;
 }
+
+function getEventPriority(event){
+  var eventDate = new Date(event.getDate()).getTime();
+  var eventRequestDate = new Date(event.getRequestDate()).getTime();
+
+  var daysNotifiedInAdvance = convertMillisecondsToDays(eventDate - eventRequestDate);
+
+  if (daysNotifiedInAdvance < daysPriorEventLowPriority && daysNotifiedInAdvance > daysPriorEventMediumPriority){
+    return "medium";
+  }
+  else if (daysNotifiedInAdvance <= daysPriorEventMediumPriority && daysNotifiedInAdvance >= 0){
+    return "high";
+  }
+  else{
+    return "low";
+  }  
+}
+
+function convertMillisecondsToDays(milliseconds){
+  //milliseconds / (Hours * Minutes * Seconds * Milliseconds)
+  return Math.floor(milliseconds / (24 * 60 * 60 * 1000));
+} 
 
 //https://developers.google.com/apps-script/guides/html/templates#code.gs_1
 function showWebPage(file, title, width, height) {

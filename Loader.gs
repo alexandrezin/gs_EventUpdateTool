@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------------------//
 //                                    AVI-SPL Event Tracker Script                                   //
-//------------------------------------------- v1.0 - 2021 -------------------------------------------//
+//--------------------------------------- Beta 2021 April 1st ---------------------------------------//
 //              Alexandre Zin.   Michael Nishimura.   Guang Lai.   Marcelo Aranovich.                //
 //---------------------------------------------------------------------------------------------------//
 
@@ -17,6 +17,9 @@ function installSpreadsheetPermissions() {
 //Global Constants
 const spreadsheetLink = "https://docs.google.com/spreadsheets/d/1ornnvbUnpBTXP8v0M9k9PIxMjOrF5Q5T-x4vVoKxZkk/edit";
 //
+daysPriorEventLowPriority = 7;    //7 Days notice prior to the event --> Event Priority = LOW
+daysPriorEventMediumPriority = 2; //2 or more days notice prior to the event --> Event Priority = MEDIUM
+//                                //0 to 2 days notice prior to the event --> Event Priority = HIGH
 const eventIdColumn = 1;
 const eventRequestDateColumn = 2;
 const eventRequesterColumn = 3;
@@ -27,13 +30,14 @@ const eventSetupTimeColumn = 7;
 const eventStartTimeColumn = 8;
 const eventEndTimeColumn = 9;
 const eventStatusColumn = 10;
-const eventNotifiedInAdvanceColumn = 11;
-const eventTechNotesColumn = 12;
-const eventActualSetupTimeColumn = 13;
-const eventActualStartTimeColumn = 14;
-const eventActualEndTimeColumn = 15;
-const eventIncidentsColumn = 16;
-const eventObservationsColumn = 17;
+const eventAssigneeColumn = 11;
+const eventNotifiedInAdvanceColumn = 12;
+const eventTechNotesColumn = 13;
+const eventActualSetupTimeColumn = 14;
+const eventActualStartTimeColumn = 15;
+const eventActualEndTimeColumn = 16;
+const eventIncidentsColumn = 17;
+const eventObservationsColumn = 18;
 
 function onOpen(){
   var ui = SpreadsheetApp.getUi();
@@ -45,6 +49,7 @@ function onOpen(){
     .addItem("Report a Bug", "openReportBug")
     .addSeparator()
     .addItem("Help", "openHelpSite")
+    .addItem("Changelog", "openChangelog") 
     .addToUi();
 }
 
@@ -62,7 +67,7 @@ function onFormSubmit(e){
   submittedEvent.setRequester(values[1].split('@')[0]);
   submittedEvent.setName(values[2]);
   submittedEvent.setType(values[3]);
-  submittedEvent.setDate(values[4]);
+  submittedEvent.setDate("" + values[4].toString().split("/")[0] + "/" + values[4].toString().split("/")[1] + "/" + values[4].toString().split("/")[2] + " 00:00:00 GMT-0800");
   if (values[5] != "") submittedEvent.setSetupTime("Sat Dec 30 1899 GMT-0800 " + values[5]);
   if (values[6] != "") submittedEvent.setStartTime("Sat Dec 30 1899 GMT-0800 " + values[6]);
   if (values[7] != "") submittedEvent.setEndTime("Sat Dec 30 1899 GMT-0800 " + values[7]);

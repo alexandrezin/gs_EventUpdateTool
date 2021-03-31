@@ -12,6 +12,9 @@ function openHelpSite(){
   redirectTo("https://sites.google.com/corp/google.com/event-tracker-help/home");
 }
 
+function openChangelog(){
+  redirectTo("https://sites.google.com/corp/google.com/event-tracker-help/log");
+}
 //-----------------------------------------
 
 function redirectTo(link){

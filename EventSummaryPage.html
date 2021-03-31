@@ -164,6 +164,14 @@
       }
     </style>
     <script>
+      function highlightFieldRed(fieldId){
+        document.getElementById(fieldId).style.backgroundColor = "#ffe6e6";
+      }
+
+      function highlightFieldStrongRed(fieldId){
+        document.getElementById(fieldId).style.backgroundColor = "#ff0000";
+      }
+
       function refreshStatusColor(fieldObject){
         var color;
 
@@ -172,6 +180,7 @@
         else if (fieldObject.value == "Rescheduled") color = "#0055ec";
         else if (fieldObject.value == "Cancelled") color = "#e80000";
         else if (fieldObject.value == "Pending Date") color = "#d7a000";
+        else if (fieldObject.value == "Pending Assignment") color = "#ff9900";
 
         fieldObject.style.backgroundColor = color;  
       }
@@ -194,6 +203,7 @@
         var observations = document.getElementById('eventObservations').value;
         
         var status = document.getElementById('eventStatus').value;
+        var assignee = document.getElementById('eventAssignee').value;
 
         var popup = document.createElement("IFRAME");
         popup.setAttribute("src", 'data:text/plain,');
@@ -221,6 +231,22 @@
           }
         }
 
+        if(status != "Pending Assignment" && assignee == ""){
+          highlightFieldRed('eventAssignee');
+
+          window.frames[0].window.alert("Please provide the event assignee");
+          popup.remove();
+          return false;
+        }
+
+        if(status == "Pending Assignment" && assignee != ""){
+          highlightFieldStrongRed('eventStatus');
+
+          window.frames[0].window.alert("Please update the event status");
+          popup.remove();
+          return false;
+        }
+
         if(setupTime > startTime) error = "eventSetupTime";
         else if(startTime > endTime) error = "eventStartTime";
         else if(actualSetupTime > actualStartTime) error = "eventActualSetupTime";
@@ -243,11 +269,6 @@
           }
         }
       }
-
-      function highlightFieldRed(fieldId){
-        document.getElementById(fieldId).style.backgroundColor = "#ffe6e6";
-      }
-
     </script>
   </head>
   <body>
@@ -265,6 +286,7 @@
             <option value="Rescheduled" <?= selectedEvent.getEventStatusDefaultSelected("Rescheduled"); ?> >Rescheduled</option>
             <option value="Cancelled" <?= selectedEvent.getEventStatusDefaultSelected("Cancelled"); ?> >Cancelled</option>
             <option value="Pending Date"<?= selectedEvent.getEventStatusDefaultSelected("Pending Date"); ?> >Pending Date</option>
+            <option value="Pending Assignment"<?= selectedEvent.getEventStatusDefaultSelected("Pending Assignment"); ?> >Pending Assignment</option>
           </select>
         </div>
         <div class="item readonly">
@@ -274,6 +296,24 @@
         <br/>
         <p> <strong> Event Information </strong> </p>
         <hr/>
+        <div class="item">
+          <p>Event Assignee</p>
+          <select name="eventAssignee" id="eventAssignee" style="font-weight:bold;" onchange="refreshBg(this)">
+            <option value="">-- Select The Assignee --</option>
+            <option value="minoruw" <?= selectedEvent.getEventAssigneeDefaultSelected("minoruw"); ?> >Alexander Watanabe</option>
+            <option value="alexandrez" <?= selectedEvent.getEventAssigneeDefaultSelected("alexandrez"); ?> >Alexandre Zin</option>
+            <option value="cameronle" <?= selectedEvent.getEventAssigneeDefaultSelected("cameronle"); ?> >Cameron Lee</option>
+            <option value="glai" <?= selectedEvent.getEventAssigneeDefaultSelected("glai"); ?> >Guang Lai</option>
+            <option value="jamesmadden" <?= selectedEvent.getEventAssigneeDefaultSelected("jamesmadden"); ?> >James Madden</option>
+            <option value="keithbrady" <?= selectedEvent.getEventAssigneeDefaultSelected("keithbrady"); ?> >Keith Brady</option>
+            <option value="lcahill" <?= selectedEvent.getEventAssigneeDefaultSelected("lcahill"); ?> >Lee Cahill</option>
+            <option value="maranovich" <?= selectedEvent.getEventAssigneeDefaultSelected("maranovich"); ?> >Marcelo Aranovich</option>
+            <option value="marquiscollins" <?= selectedEvent.getEventAssigneeDefaultSelected("marquiscollins"); ?> >Marquis Collins</option>
+            <option value="midelacruz" <?= selectedEvent.getEventAssigneeDefaultSelected("midelacruz"); ?> >Michael Dela Cruz</option>
+            <option value="uhohyoh" <?= selectedEvent.getEventAssigneeDefaultSelected("uhohyoh"); ?> >Michael Nishimura</option>
+            <option value="stanleytan" <?= selectedEvent.getEventAssigneeDefaultSelected("stanleytan"); ?> >Stanley Tan</option>
+          </select>
+        </div>
         <div class="item readonly">
           <p>Event ID</p>
           <input type="text" name="eventId" value="<?= selectedEvent.getId(); ?>" readonly/>

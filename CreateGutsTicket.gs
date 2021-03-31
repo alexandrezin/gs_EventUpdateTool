@@ -6,7 +6,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for MTV
   if(siteLocation == "Google Partner Plex, Mountain View"){
-    var assignee = "cameronle";
     var ccList = "cameronle, lcahill, arca, ericmejia";
     var region = "AMER";
     var site = "GPP-MTV";
@@ -15,7 +14,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for RWC
   else if(siteLocation == "The Grove, Redwood City"){
-    var assignee = "uhohyoh";
     var ccList = "glai, uhohyoh, arca, ericmejia";
     var region = "AMER";
     var site = "GRV-RWC";
@@ -24,7 +22,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for PLV
   else if(siteLocation == "Room 98, Playa Vista"){
-    var assignee = "marquiscollins";
     var ccList = "marquiscollins, arca, ericmejia";
     var region = "AMER";
     var site = "RDH-PLV";
@@ -33,7 +30,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for DUB
   else if(siteLocation == "The Foundry, Dublin"){
-    var assignee = "jamesmadden";
     var ccList = "keithbrady, jamesmadden, colinbyrne, arca";
     var region = "EMEA";
     var site = "GPP-DUB";
@@ -42,7 +38,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for SAO
   else if(siteLocation == "Partnerplex, São Paulo"){
-    var assignee = "alexandrez";
     var ccList = "alexandrez, maranovich, colinbyrne, arca";
     var region = "LATAM";
     var site = "GPP-SAO";
@@ -51,7 +46,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for SIN
   else if(siteLocation == "RoundHouse, Singapore"){
-    var assignee = "stanleytan";
     var ccList = "stanleytan, nheng, arca";
     var region = "APAC";
     var site = "RDH-SIN";
@@ -60,7 +54,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for TOK
   else if(siteLocation == "Partnerplex Stream, Tokyo"){
-     var assignee = "minoruw";
      var ccList = "minoruw, midelacruz, nheng, arca";
      var region = "APAC";
      var site = "GPP-TOK";
@@ -69,10 +62,10 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Guts Summary and Description This needs QA
   var summary = "" + submittedEvent.getDate() + " " + siteLocation + " - " + submittedEvent.getType() + " - " + submittedEvent.getName() + " ";
-  var description = "" + siteLocation + " " + submittedEvent.getType() + "\n \n" + "Event Name: " + submittedEvent.getName() + "\n Event Date: " + submittedEvent.getDate() + "\n Event Setup Time: " + submittedEvent.getSetupTime() + "\n Event Start Time: " + submittedEvent.getStartTime() + "\n Event End Time: " + submittedEvent.getEndTime() + "\n Tech Notes:" + submittedEvent.getTechNotes();
+  var description = "" + siteLocation + " " + submittedEvent.getType() + "\n \n" + "Event Name: " + submittedEvent.getName() + "\n Event Date: " + submittedEvent.getDate() + "\n Event Setup Time: " + submittedEvent.getSetupTime() + "\n Event Start Time: " + submittedEvent.getStartTime() + "\n Event End Time: " + submittedEvent.getEndTime() + "\n\n Tech Notes: " + submittedEvent.getTechNotes();
 
   // The category, type, and item have to exist in GUTS to be used. They are also case-sensitive.
-  var priority = "low";
+  var priority = getEventPriority(submittedEvent);
 
   // Get last cell in the last row of the form response sheet to set the created GUTS ticket link
   var formResponses = SpreadsheetApp.getActiveSheet();
@@ -84,10 +77,8 @@ function createGutsTicket(submittedEvent, siteLocation) {
   "ticket":{
     "core":{
         "requester":submittedEvent.getRequester(),
-        "assignee":assignee,
         "cc":[ccList],
-        "status":"Pending",
-        "pendingWhat":"Pending Project",
+        "status":"Assigned",
         "priority":priority,
         "summary":summary,
         "description":description,

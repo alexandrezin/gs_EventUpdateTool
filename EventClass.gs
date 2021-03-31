@@ -1,6 +1,6 @@
 class Event {
 
-  constructor(id, requestDate, requester, type, name, date, setupTime, startTime, endTime, status, notifiedInAdvance, techNotes, actualSetupTime, actualStartTime, actualEndTime, incidents, observations, htmlContent) {
+  constructor(id, requestDate, requester, type, name, date, setupTime, startTime, endTime, status, notifiedInAdvance, techNotes, actualSetupTime, actualStartTime, actualEndTime, incidents, observations, assignee) {
     
     //Attributes
     this.id = id;
@@ -20,12 +20,14 @@ class Event {
     this.actualEndTime = actualEndTime;
     this.incidents = incidents;
     this.observations = observations;
+    this.assignee = assignee;
 
     //Methods
     this.toString=function(){
       return "ID: "               + this.getId()
         + "\nRequestDate: "       + this.getRequestDate()
         + "\nRequester: "         + this.getRequester()
+        + "\nAssignee: "          + this.getAssignee()
         + "\nType: "              + this.getType()
         + "\nName: "              + this.getName()
         + "\nDate: "              + this.getDate()
@@ -40,6 +42,13 @@ class Event {
         + "\nActualEndTime: "     + this.getActualEndTime()
         + "\nIncidents: "         + this.getIncidents()
         + "\nObservations: "      + this.getObservations();
+    }
+
+    this.getEventAssigneeDefaultSelected=function(option){
+      if (option == this.assignee){
+        return "selected";
+      }
+      else return "";
     }
 
     this.getEventStatusDefaultSelected=function(option){
@@ -74,7 +83,9 @@ class Event {
         case "Cancelled":
           return "#e80000";
         case "Pending Date":
-          return "#d7a000";        
+          return "#d7a000";
+        case "Pending Assignment":
+          return "#ff9900";        
         default:
           return "#000000";
       }
@@ -233,6 +244,14 @@ class Event {
     };
     this.getObservations=function(){
       return this.observations;
+    }
+
+    //GET-SET assignee
+    this.setAssignee=function(assignee){
+      this.assignee = assignee;
+    };
+    this.getAssignee=function(){
+      return this.assignee;
     }
   }
 }

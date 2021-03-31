@@ -22,7 +22,7 @@ function insertOnDatabase(submittedEvent, siteLocation){
  sheet.getRange(row, eventStartTimeColumn).setValue(submittedEvent.getStartTime());
  sheet.getRange(row, eventEndTimeColumn).setValue(submittedEvent.getEndTime());
  //Set the event status to scheduled
- sheet.getRange(row, eventStatusColumn).setValue("Scheduled");
+ sheet.getRange(row, eventStatusColumn).setValue("Pending Assignment");
  //Write the "Notified in Advance" formula - =IF(DATEDIF(B3,F3,"D") > 7,"Yes", "No")
  sheet.getRange(row, eventNotifiedInAdvanceColumn).setValue("=IF(DATEDIF(B" + row + ",F" + row + ",\"D\") > 7,\"Yes\", \"No\")");
  //Write the event notes and set a border
