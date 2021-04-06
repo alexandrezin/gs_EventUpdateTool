@@ -10,7 +10,7 @@ function openEventSummary(){
   //Get the event information of that row
   selectedEvent = getEventInformation(sheet, selectedRow);
 
-  Logger.log("Selected Event: " + selectedEvent.getId());
+  Logger.log("Selected Event: \n" + selectedEvent.toString());
 
   //Call the function to show the web page
   showWebPage("EventSummaryPage", "Event Summary", "700", "800");
@@ -149,7 +149,7 @@ function getEventInformation(sheet, row){
   
   Logger.log("Getting event information");
 
-  var values = sheet.getRange("A" + row + ":Q" + row).getValues();
+  var values = sheet.getRange("A" + row + ":R" + row).getValues();
 
   event.setId(values[0][eventIdColumn - 1]);
   event.setRequestDate("" + values[0][eventRequestDateColumn - 1].toString().split(" ")[1] + " " + values[0][eventRequestDateColumn - 1].toString().split(" ")[2] + " " + values[0][eventRequestDateColumn - 1].toString().split(" ")[3] + " 00:00:00 GMT-0800");

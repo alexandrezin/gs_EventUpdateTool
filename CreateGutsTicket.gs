@@ -1,8 +1,10 @@
 function createGutsTicket(submittedEvent, siteLocation) {
-
+ 
+ Logger.log("Waiting For GUTS API Script Lock"); 
  //Lock the function to avoid problems with multiple submissions at the same time
  var lock = LockService.getScriptLock(); //Lock
  lock.waitLock(30000);                   //For 30 sec.
+ Logger.log("Starting GUTS API Service");
 
   //Check for MTV
   if(siteLocation == "Google Partner Plex, Mountain View"){
@@ -14,7 +16,7 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for RWC
   else if(siteLocation == "The Grove, Redwood City"){
-    var ccList = "glai, uhohyoh, arca, ericmejia";
+    var ccList = "glai, uhohyoh, arca, ericmejia, michellelu, trishat";
     var region = "AMER";
     var site = "GRV-RWC";
     var attendingTech = "glai, uhohyoh";
@@ -30,7 +32,7 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for DUB
   else if(siteLocation == "The Foundry, Dublin"){
-    var ccList = "keithbrady, jamesmadden, colinbyrne, arca";
+    var ccList = "keithbrady, jamesmadden, colinbyrne, arca, rowenar, ciaranmurphy";
     var region = "EMEA";
     var site = "GPP-DUB";
     var attendingTech = "keithbrady, jamesmadden";
@@ -38,7 +40,8 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for SAO
   else if(siteLocation == "Partnerplex, São Paulo"){
-    var ccList = "alexandrez, maranovich, colinbyrne, arca";
+    var ccList = "alexandrez, maranovich, colinbyrne, arca, margarethg, renatatavares";
+    //var ccList = "alexandrez";
     var region = "LATAM";
     var site = "GPP-SAO";
     var attendingTech = "alexandrez, maranovich";
@@ -102,8 +105,6 @@ function createGutsTicket(submittedEvent, siteLocation) {
     }
   };
 
-  Logger.log(ticketJSON);
-
   // Make API call to guts to create a ticket
   try {
     var response = Guts.Tickets.create(ticketJSON);
@@ -114,16 +115,19 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
     //Release the function lock
     lock.releaseLock();
-
+    Logger.log("Releasing GUTS API Service");
+    
     return ticketId;
   }
 
-  catch(err) {  
+  catch(err) { 
+    Logger.log("Error trying to create ticket:"); 
     Logger.log(err);
     Logger.log(response);
 
     //Release the function lock
     lock.releaseLock(); 
+    Logger.log("Releasing GUTS API Service");
 
     return 0;
   }

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------------------//
 //                                    AVI-SPL Event Tracker Script                                   //
-//--------------------------------------- Beta 2021 April 1st ---------------------------------------//
+//--------------------------------------- Beta 2021 April 5th ---------------------------------------//
 //              Alexandre Zin.   Michael Nishimura.   Guang Lai.   Marcelo Aranovich.                //
 //---------------------------------------------------------------------------------------------------//
 
@@ -54,10 +54,10 @@ function onOpen(){
 }
 
 function onFormSubmit(e){
-  Logger.log(e);
-
   //Values will be an array with values in the same order as they appear in the spreadsheet.
   var values = e.values;
+
+  Logger.log("Received Event: " + values[3]);
 
   //Create a instance of Event
   var submittedEvent = new Event();
@@ -75,12 +75,17 @@ function onFormSubmit(e){
 
   var submittedEventSiteLocation = values[9];
 
-  for (var tries = 0; tries < 3; tries++){
+  Logger.log("Created Event Class: " + submittedEvent.getName());
+
+  for (var tries = 1; tries < 4; tries++){
     //Create Guts Ticket
+    Logger.log("Creating Guts Ticket Attempt[" + tries + "/3]");
     submittedEvent.setId(createGutsTicket(submittedEvent, submittedEventSiteLocation));
     if (submittedEvent.getId() != 0) tries = 3;
   }
 
+  Logger.log("Inserting event [" + submittedEvent.getId() + "] on database");
+  
   //Insert Event On Database
   insertOnDatabase(submittedEvent, submittedEventSiteLocation);
 }
