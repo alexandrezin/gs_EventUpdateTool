@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------------------//
 //                                    AVI-SPL Event Tracker Script                                   //
-//--------------------------------------- Beta 2021 April 5th ---------------------------------------//
+//------------------------------------- 2021 August 1st Version -------------------------------------//
 //              Alexandre Zin.   Michael Nishimura.   Guang Lai.   Marcelo Aranovich.                //
 //---------------------------------------------------------------------------------------------------//
 
@@ -36,8 +36,9 @@ const eventTechNotesColumn = 13;
 const eventActualSetupTimeColumn = 14;
 const eventActualStartTimeColumn = 15;
 const eventActualEndTimeColumn = 16;
-const eventIncidentsColumn = 17;
-const eventObservationsColumn = 18;
+const eventRunByColumn = 17;
+const eventIncidentsColumn = 18;
+const eventObservationsColumn = 19;
 
 function onOpen(){
   var ui = SpreadsheetApp.getUi();

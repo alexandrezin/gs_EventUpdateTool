@@ -1,6 +1,6 @@
 class Event {
 
-  constructor(id, requestDate, requester, type, name, date, setupTime, startTime, endTime, status, notifiedInAdvance, techNotes, actualSetupTime, actualStartTime, actualEndTime, incidents, observations, assignee) {
+  constructor(id, requestDate, requester, type, name, date, setupTime, startTime, endTime, status, notifiedInAdvance, techNotes, actualSetupTime, actualStartTime, actualEndTime, incidents, observations, assignee,runBy) {
     
     //Attributes
     this.id = id;
@@ -21,6 +21,7 @@ class Event {
     this.incidents = incidents;
     this.observations = observations;
     this.assignee = assignee;
+    this.runBy = runBy;
 
     //Methods
     this.toString=function(){
@@ -40,8 +41,16 @@ class Event {
         + "\nActualSetupTime: "   + this.getActualSetupTime()
         + "\nActualStartTime: "   + this.getActualStartTime()
         + "\nActualEndTime: "     + this.getActualEndTime()
+        + "\nRunBy: "             + this.getRunBy()
         + "\nIncidents: "         + this.getIncidents()
         + "\nObservations: "      + this.getObservations();
+    }
+
+    this.getEventRunByDefaultSelected=function(option){
+      if (option == this.runBy){
+        return "selected";
+      }
+      else return "";
     }
 
     this.getEventAssigneeDefaultSelected=function(option){
@@ -252,6 +261,14 @@ class Event {
     };
     this.getAssignee=function(){
       return this.assignee;
+    }
+
+    //GET-SET runBy
+    this.setRunBy=function(runBy){
+      this.runBy = runBy;
+    };
+    this.getRunBy=function(){
+      return this.runBy;
     }
   }
 }

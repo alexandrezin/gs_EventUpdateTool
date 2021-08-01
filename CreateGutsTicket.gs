@@ -8,10 +8,10 @@ function createGutsTicket(submittedEvent, siteLocation) {
 
   //Check for MTV
   if(siteLocation == "Google Partner Plex, Mountain View"){
-    var ccList = "cameronle, lcahill, arca, ericmejia";
+    var ccList = "cameronle, thongn, arca, ericmejia";
     var region = "AMER";
     var site = "GPP-MTV";
-    var attendingTech = "cameronle, lcahill";
+    var attendingTech = "cameronle, thongn";
   }
 
   //Check for RWC

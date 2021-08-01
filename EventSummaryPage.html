@@ -4,6 +4,7 @@
     <title>Event Summary</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
     <style>
       html, body {
         min-height: 100%;
@@ -162,14 +163,28 @@
           width: calc(100% - 6px);
         }
       }
+      .alert {
+        border: 1px;
+        border-radius: 20px;
+        padding: 5px;
+        text-align: center;
+        background-color: #f44336;
+        color: white;
+        opacity: 1;
+        transition: 1.0s;
+      }
+      .alert:hover{
+        background-color: #d2190b; 
+      }
+      .alert.success {background-color: #04AA6D;}
+      .alert.info {background-color: #2196F3;}
+      .alert.warning {background-color: #ff9800;}
     </style>
     <script>
       function highlightFieldRed(fieldId){
-        document.getElementById(fieldId).style.backgroundColor = "#ffe6e6";
-      }
-
-      function highlightFieldStrongRed(fieldId){
-        document.getElementById(fieldId).style.backgroundColor = "#ff0000";
+        document.getElementById(fieldId).style.color = "#666";
+        document.getElementById(fieldId).style.borderColor = "red";
+        document.getElementById(fieldId).style.backgroundColor = "#ffe6e6"
       }
 
       function refreshStatusColor(fieldObject){
@@ -183,90 +198,140 @@
         else if (fieldObject.value == "Pending Assignment") color = "#ff9900";
 
         fieldObject.style.backgroundColor = color;  
+        fieldObject.style.borderColor = "#ccc";
+        fieldObject.style.color = "white";
       }
       
-      function refreshBg(fieldObject){
-        fieldObject.style.backgroundColor = "#ffffff";
+      function refreshFieldColor(fieldObject){
+        fieldObject.style.borderColor = "#ccc";
+        fieldObject.style.backgroundColor = "#ffffff"
       }
 
       function handleFormSubmit(formObject) {
-        var error = "";
+        //Local Variables
+        var alertMessage;
 
-        var setupTime = document.getElementById('eventSetupTime').value;
-        var startTime = document.getElementById('eventStartTime').value;
-        var endTime = document.getElementById('eventEndTime').value;
-        
-        var actualSetupTime = document.getElementById('eventActualSetupTime').value;
-        var actualStartTime = document.getElementById('eventActualStartTime').value;
-        var actualEndTime = document.getElementById('eventActualEndTime').value;
-        var incidents = document.getElementById('eventIncidents').value;
-        var observations = document.getElementById('eventObservations').value;
-        
-        var status = document.getElementById('eventStatus').value;
-        var assignee = document.getElementById('eventAssignee').value;
-
-        var popup = document.createElement("IFRAME");
-        popup.setAttribute("src", 'data:text/plain,');
-        document.documentElement.appendChild(popup);
-
-        if(status == "Done"){
-          if(actualSetupTime == "" || actualStartTime == "" || actualEndTime == "" || incidents == ""){
-            highlightFieldRed('eventActualSetupTime');
-            highlightFieldRed('eventActualStartTime');
-            highlightFieldRed('eventActualEndTime');
-            highlightFieldRed('eventIncidents');
-
-            window.frames[0].window.alert("Please provide the post-event information");
-            popup.remove();
-            return false;
+        //Local Classes
+        class Error {
+          constructor(field, message) {
+            //Attributes
+            this.field = field;
+            this.message = message;
           }
-          else{
-            if(incidents == "Yes" && observations == ""){
-              highlightFieldRed('eventObservations');
-
-              window.frames[0].window.alert("Please provide details of the incident");
-              popup.remove();
-              return false;
-            }
+          toHtmlList(){
+            return "<li>" + this.message + "</li>";
+          }
+          highlightField(){
+            highlightFieldRed(this.field);  
           }
         }
 
-        if(status != "Pending Assignment" && assignee == ""){
-          highlightFieldRed('eventAssignee');
-
-          window.frames[0].window.alert("Please provide the event assignee");
-          popup.remove();
-          return false;
+        class Errors{
+          constructor(){
+            this.errors = [];
+          }
+          newError(field, message){
+            let t = new Error(field, message);
+            this.errors.push(t);
+          }
+          get allErrors(){
+            return this.errors;
+          }
         }
 
-        if(status == "Pending Assignment" && assignee != ""){
-          highlightFieldStrongRed('eventStatus');
+        //Create a new error list
+        errorList = new Errors;
 
-          window.frames[0].window.alert("Please update the event status");
-          popup.remove();
-          return false;
-        }
+        //Get alert and warning bars
+        var alertBar = document.getElementById("alert");
+        var warningBar = document.getElementById("warning");
 
-        if(setupTime > startTime) error = "eventSetupTime";
-        else if(startTime > endTime) error = "eventStartTime";
-        else if(actualSetupTime > actualStartTime) error = "eventActualSetupTime";
-        else if(actualStartTime > actualEndTime) error = "eventActualStartTime";
+        //Get HTML fields
+        var eventStatus = document.getElementById('eventStatus');
+        var eventAssignee = document.getElementById('eventAssignee');
 
-        if (error != ""){
-          document.getElementById(error).style.backgroundColor = "#ffe6e6";
-          window.frames[0].window.alert("Please review the " + error + " field.");
-          popup.remove();
-          return false;
+        var eventSetupTime = document.getElementById('eventSetupTime');
+        var eventStartTime = document.getElementById('eventStartTime');
+        var eventEndTime = document.getElementById('eventEndTime');
+        
+        var eventActualSetupTime = document.getElementById('eventActualSetupTime');
+        var eventActualStartTime = document.getElementById('eventActualStartTime');
+        var eventActualEndTime = document.getElementById('eventActualEndTime');
+        var eventRunBy = document.getElementById('eventRunBy');
+        var eventIncidents = document.getElementById('eventIncidents');
+        var eventObservations = document.getElementById('eventObservations');
+
+        //Hide both alert and warning bars
+        alertBar.style.display = "none";
+        warningBar.style.display = "none";
+
+        //Check the provided information ----------------------------------------
+
+        //Check Event Status field
+        if(eventStatus.value == "Pending Assignment" && eventAssignee.value != "")
+          errorList.newError(eventStatus.id, "Please, update the <u>Event Status</u> as a Tech is already assigned to this event.");
+
+        //Check Event Assignee field
+        if(eventStatus.value != "Pending Assignment" && eventAssignee.value == "")
+          errorList.newError(eventAssignee.id, "Please, provide the <u>Event Assignee</u>.");
+
+        //Check Setup Time field
+        if(eventSetupTime.value > eventStartTime.value)
+          errorList.newError(eventSetupTime.id, "The <u>Setup Time</u> must be earlier than the Start Time");
+
+        //Check Start Time field
+        if(eventStartTime.value > eventEndTime.value)
+          errorList.newError(eventStartTime.id, "The <u>Start Time</u> must be earlier than the End Time");
+
+        //Check Actual Setup Time field
+        if(eventActualSetupTime.value == "" && eventStatus.value == "Done") 
+          errorList.newError(eventActualSetupTime.id, "Please, provide the <u>Actual Setup Time</u>.");
+        if(eventActualSetupTime.value > eventActualStartTime.value)
+          errorList.newError(eventActualSetupTime.id, "The <u>Actual Setup Time</u> must be earlier than the Actual Start Time");
+
+        //Check Actual Start Time field
+        if(eventActualStartTime.value == "" && eventStatus.value == "Done") 
+          errorList.newError(eventActualStartTime.id, "Please, provide the <u>Actual Start Time</u>.");
+        if(eventActualStartTime.value > eventActualEndTime.value)
+          errorList.newError(eventActualStartTime.id, "The <u>Actual Start Time</u> must be earlier than the Actual End Time");
+
+        //Check Actual End Time field
+        if(eventActualEndTime.value == "" && eventStatus.value == "Done") 
+          errorList.newError(eventActualEndTime.id, "Please, provide the <u>Actual End Time</u>.");
+
+        //Check Event Run By dropdown
+        if(eventRunBy.value == "" && eventStatus.value == "Done") 
+          errorList.newError(eventRunBy.id, "Please, select a valid option from the <u>Event Run By</u> dropdown list.");
+
+        //Check Any Incidents? dropdown
+        if(eventIncidents.value == "" && eventStatus.value == "Done") 
+          errorList.newError(eventIncidents.id, "Please, select a valid option from the <u>Any Incidents?</u> dropdown list.");
+
+        //Check Observations field
+        if(eventObservations.value == "" && eventIncidents.value == "Yes" && eventStatus.value == "Done") 
+          errorList.newError(eventObservations.id, "Please, provide details of the incident on <u>Observations</u> field.");
+
+        //Handle Form submission ------------------------------------------------
+
+        //Check if there is any error  
+        if(errorList.allErrors.length > 0){
+          //Change alert bar content
+          alertMessage = "<ul align=\"left\">";
+          errorList.allErrors.forEach(e => alertMessage = alertMessage + e.toHtmlList());
+          alertMessage = alertMessage + "</ul>"
+
+          //Highlight fields
+          errorList.allErrors.forEach(e => e.highlightField());
+
+          //Show alert bar
+          alertBar.innerHTML = alertMessage;
+          alertBar.style.display = "block";
+          
+          return false;  
         }
 
         else{
-          if(window.frames[0].window.confirm("Do you really want to update this event?")){
-            google.script.run.processForm(formObject);
-          }
-          else {
-            popup.remove();
-            return false;
-          }
+          google.script.run.processForm(formObject);
         }
       }
     </script>
@@ -298,20 +363,23 @@
         <hr/>
         <div class="item">
           <p>Event Assignee</p>
-          <select name="eventAssignee" id="eventAssignee" style="font-weight:bold;" onchange="refreshBg(this)">
+          <select name="eventAssignee" id="eventAssignee" style="font-weight:bold;" onchange="refreshFieldColor(this)">
             <option value="">-- Select The Assignee --</option>
             <option value="minoruw" <?= selectedEvent.getEventAssigneeDefaultSelected("minoruw"); ?> >Alexander Watanabe</option>
             <option value="alexandrez" <?= selectedEvent.getEventAssigneeDefaultSelected("alexandrez"); ?> >Alexandre Zin</option>
             <option value="cameronle" <?= selectedEvent.getEventAssigneeDefaultSelected("cameronle"); ?> >Cameron Lee</option>
+            <option value="colinbyrne" <?= selectedEvent.getEventAssigneeDefaultSelected("colinbyrne"); ?> >Colin Byrne</option>
+            <option value="ericmejia" <?= selectedEvent.getEventAssigneeDefaultSelected("ericmejia"); ?> >Eric Mejia</option>
             <option value="glai" <?= selectedEvent.getEventAssigneeDefaultSelected("glai"); ?> >Guang Lai</option>
             <option value="jamesmadden" <?= selectedEvent.getEventAssigneeDefaultSelected("jamesmadden"); ?> >James Madden</option>
             <option value="keithbrady" <?= selectedEvent.getEventAssigneeDefaultSelected("keithbrady"); ?> >Keith Brady</option>
-            <option value="lcahill" <?= selectedEvent.getEventAssigneeDefaultSelected("lcahill"); ?> >Lee Cahill</option>
             <option value="maranovich" <?= selectedEvent.getEventAssigneeDefaultSelected("maranovich"); ?> >Marcelo Aranovich</option>
             <option value="marquiscollins" <?= selectedEvent.getEventAssigneeDefaultSelected("marquiscollins"); ?> >Marquis Collins</option>
             <option value="midelacruz" <?= selectedEvent.getEventAssigneeDefaultSelected("midelacruz"); ?> >Michael Dela Cruz</option>
             <option value="uhohyoh" <?= selectedEvent.getEventAssigneeDefaultSelected("uhohyoh"); ?> >Michael Nishimura</option>
+            <option value="nheng" <?= selectedEvent.getEventAssigneeDefaultSelected("nheng"); ?> >Ng Kim Heng</option>
             <option value="stanleytan" <?= selectedEvent.getEventAssigneeDefaultSelected("stanleytan"); ?> >Stanley Tan</option>
+            <option value="thongn" <?= selectedEvent.getEventAssigneeDefaultSelected("thongn"); ?> >Thong Nguyen</option>
           </select>
         </div>
         <div class="item readonly">
@@ -355,34 +423,43 @@
         </div>
         <div class="item">
           <p>Setup Time</p>
-          <input type="time" id="eventSetupTime" name="eventSetupTime" value="<?= selectedEvent.getSetupTime(); ?>" onkeyup="refreshBg(this)"/>
+          <input type="time" id="eventSetupTime" name="eventSetupTime" value="<?= selectedEvent.getSetupTime(); ?>" onkeyup="refreshFieldColor(this)"/>
         </div>
         <div class="item">
           <p>Start Time</p>
-          <input type="time" id="eventStartTime" name="eventStartTime" value="<?= selectedEvent.getStartTime(); ?>" onkeyup="refreshBg(this)"/>
+          <input type="time" id="eventStartTime" name="eventStartTime" value="<?= selectedEvent.getStartTime(); ?>" onkeyup="refreshFieldColor(this)"/>
         </div>
         <div class="item">
           <p>End Time</p>
-          <input type="time" id="eventEndTime" name="eventEndTime" value="<?= selectedEvent.getEndTime(); ?>" onkeyup="refreshBg(this)"/>
+          <input type="time" id="eventEndTime" name="eventEndTime" value="<?= selectedEvent.getEndTime(); ?>" onkeyup="refreshFieldColor(this)"/>
         </div>
         <br/>
         <p> <strong>Post-Event Information</strong> </p>
         <hr/>
         <div class="item"> 
           <p>Actual Setup Time</p>
-          <input type="time" id="eventActualSetupTime" name="eventActualSetupTime" value="<?= selectedEvent.getActualSetupTime(); ?>" onkeyup="refreshBg(this)"/>
+          <input type="time" id="eventActualSetupTime" name="eventActualSetupTime" value="<?= selectedEvent.getActualSetupTime(); ?>" onkeyup="refreshFieldColor(this)"/>
         </div>
         <div class="item"> 
           <p>Actual Start Time</p>
-          <input type="time" id="eventActualStartTime" name="eventActualStartTime" value="<?= selectedEvent.getActualStartTime(); ?>" onkeyup="refreshBg(this)"/>
+          <input type="time" id="eventActualStartTime" name="eventActualStartTime" value="<?= selectedEvent.getActualStartTime(); ?>" onkeyup="refreshFieldColor(this)"/>
         </div>
         <div class="item"> 
           <p>Actual End Time</p>
-          <input type="time" id="eventActualEndTime" name="eventActualEndTime" value="<?= selectedEvent.getActualEndTime(); ?>" onkeyup="refreshBg(this)"/>
+          <input type="time" id="eventActualEndTime" name="eventActualEndTime" value="<?= selectedEvent.getActualEndTime(); ?>" onkeyup="refreshFieldColor(this)"/>
+        </div>
+        <div class="item">
+          <p>Event Run By</p>
+          <select id="eventRunBy" name="eventRunBy" style="font-weight:bold;" value="<?= selectedEvent.getRunBy(); ?>" onchange="refreshFieldColor(this)">
+            <option value="">Event Run By</option>
+            <option value="Site Technician" <?= selectedEvent.getEventRunByDefaultSelected("Site Technician"); ?> >Site Technician</option>
+            <option value="TSM" <?= selectedEvent.getEventRunByDefaultSelected("TSM"); ?> >TSM</option>
+            <option value="Backfill" <?= selectedEvent.getEventRunByDefaultSelected("Backfill"); ?> >Backfill</option>
+          </select>
         </div>
         <div class="item">
           <p>Any Incidents?</p>
-          <select id="eventIncidents" name="eventIncidents" style="font-weight:bold;" value="<?= selectedEvent.getIncidents(); ?>" onchange="refreshBg(this)">
+          <select id="eventIncidents" name="eventIncidents" style="font-weight:bold;" value="<?= selectedEvent.getIncidents(); ?>" onchange="refreshFieldColor(this)">
             <option value="">Incidents?</option>
             <option value="Yes" <?= selectedEvent.getEventIncidentsDefaultSelected("Yes"); ?> >Yes</option>
             <option value="No" <?= selectedEvent.getEventIncidentsDefaultSelected("No"); ?> >No</option>
@@ -391,10 +468,19 @@
         <div class="item complaint-details">
           <p>Observations</p>
           <div class="complaint-details-item">
-            <textarea rows="3" id="eventObservations" name="eventObservations" onkeyup="refreshBg(this)"><?= selectedEvent.getObservations(); ?></textarea>
+            <textarea rows="3" id="eventObservations" name="eventObservations" onkeyup="refreshFieldColor(this)"><?= selectedEvent.getObservations(); ?></textarea>
           </div>
         </div>
         <br/>
+
+        <div class="alert warning" id="warning" style="display: none;">
+          <strong> Warning! </strong>
+        </div>
+
+        <div class="alert" id="alert" style="display: none;">
+          <strong> Error! </strong> It was not possible to submit your request, please check the provided information.
+        </div>
+
         <div class="btn-block">
           <button type="button" onclick="window.open('https://gutsv3.corp.google.com/#ticket/' + '<?= selectedEvent.getId(); ?>','_blank')">Guts Link</button>
           <button type="submit">Update Event</button>

@@ -2,7 +2,7 @@ var selectedEvent = new Event();
 var errorMessage;
 
 function openEventSummary(){
-  Logger.log("Opening Event Sumary");
+  Logger.log("Opening Event Summary");
 
   //Open the spreadsheet and get the selected row
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -28,7 +28,7 @@ function processForm(formObject){
   selectedEvent = getEventInformation(sheet, selectedRow);
 
   //Get the updated event information from the HTML form object received
-  var updatedEvent = new Event(formObject.eventId,formObject.eventRequestDate, formObject.eventRequester, formObject.eventType, formObject.eventName, formObject.eventDate, formObject.eventSetupTime, formObject.eventStartTime, formObject.eventEndTime, formObject.eventStatus, formObject.eventNotifiedInAdvance, formObject.eventTechNotes, formObject.eventActualSetupTime, formObject.eventActualStartTime, formObject.eventActualEndTime, formObject.eventIncidents, formObject.eventObservations, formObject.eventAssignee);
+  var updatedEvent = new Event(formObject.eventId,formObject.eventRequestDate, formObject.eventRequester, formObject.eventType, formObject.eventName, formObject.eventDate, formObject.eventSetupTime, formObject.eventStartTime, formObject.eventEndTime, formObject.eventStatus, formObject.eventNotifiedInAdvance, formObject.eventTechNotes, formObject.eventActualSetupTime, formObject.eventActualStartTime, formObject.eventActualEndTime, formObject.eventIncidents, formObject.eventObservations, formObject.eventAssignee,formObject.eventRunBy);
 
   //Log both events
   Logger.log("Selected Event:\n" + selectedEvent.toString());
@@ -109,6 +109,7 @@ function processForm(formObject){
     sheet.getRange(eventRow, eventActualSetupTimeColumn).setValue(updatedEvent.getActualSetupTime());
     sheet.getRange(eventRow, eventActualStartTimeColumn).setValue(updatedEvent.getActualStartTime());
     sheet.getRange(eventRow, eventActualEndTimeColumn).setValue(updatedEvent.getActualEndTime());
+    sheet.getRange(eventRow, eventRunByColumn).setValue(updatedEvent.getRunBy());
     sheet.getRange(eventRow, eventIncidentsColumn).setValue(updatedEvent.getIncidents());
     sheet.getRange(eventRow, eventObservationsColumn).setValue(updatedEvent.getObservations());
     
@@ -167,6 +168,7 @@ function getEventInformation(sheet, row){
   event.setActualSetupTime(values[0][eventActualSetupTimeColumn - 1]);
   event.setActualStartTime(values[0][eventActualStartTimeColumn - 1]);
   event.setActualEndTime(values[0][eventActualEndTimeColumn - 1]);
+  event.setRunBy(values[0][eventRunByColumn - 1]);
   event.setIncidents(values[0][eventIncidentsColumn - 1]);
   event.setObservations(values[0][eventObservationsColumn - 1]);
 
